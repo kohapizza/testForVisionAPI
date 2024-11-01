@@ -18,17 +18,28 @@ class ViewController: UIViewController {
             await analyzeImage()
         }
     }
-    
-    let imageUrlString = "https://life.ja-group.jp/upload/food/vegetable/main/11_1.jpg"
 
     func analyzeImage() async {
+        guard let image = UIImage(named: "potato") else {
+            print("Image not found")
+            return
+            
+        }
+        
+        imageView.image = image
+        
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            print("Failed to convert image to JPEG data")
+            return
+        }
+        
         do {
-            let openAI = OpenAI(apiToken: "YOUR API KEY")
+            let openAI = OpenAI(apiToken: "YOUR_API_KEY")
             
             let chatQuery = ChatQuery(messages: [
                 .user(.init(content: .vision([
                     .chatCompletionContentPartTextParam(.init(text: "What's in this image? Answer in only Japanese words.")),
-                    .chatCompletionContentPartImageParam(.init(imageUrl: .init(url: imageUrlString, detail: .auto)))
+                    .chatCompletionContentPartImageParam(.init(imageUrl: .init(url: imageData, detail: .auto)))
                 ])))
             ], model: Model.gpt4_o, maxTokens: 50)
             
